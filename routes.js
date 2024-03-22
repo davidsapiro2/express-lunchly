@@ -1,4 +1,7 @@
 "use strict";
+//TODO: separate templates
+//TODO: search for parital first name full last
+//TODO: reservation validation
 
 /** Routes for Lunchly */
 
@@ -43,6 +46,13 @@ router.post("/add/", async function (req, res, next) {
   await customer.save();
 
   return res.redirect(`/${customer.id}/`);
+});
+
+/** Displays top ten users by number of reservations */
+
+router.get("/top-ten", async function (req, res, next) {
+  const customers = await Customer.getTopTen();
+  return res.render('customer_list.jinja', { customers });
 });
 
 /** Show a customer, given their ID. */
@@ -100,5 +110,6 @@ router.post("/:id/add-reservation/", async function (req, res, next) {
 
   return res.redirect(`/${customerId}/`);
 });
+
 
 module.exports = router;
