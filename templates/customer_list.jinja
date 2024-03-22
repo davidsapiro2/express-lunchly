@@ -6,14 +6,14 @@
 
   <h1>Customers</h1>
 
-  <ol style="column-count: 4">
+  <ul style="column-count: 4">
     {% for customer in customers %}
       <li>
         <a href="/{{ customer.id }}/">
-          {{ customer.fullName() }}
+          {{ customer.fullName }}
         </a>
       </li>
     {% endfor %}
-  </ol>
+  </ul>
 
 {% endblock %}

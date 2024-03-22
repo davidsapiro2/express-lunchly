@@ -13,12 +13,35 @@ class Customer {
     this.firstName = firstName;
     this.lastName = lastName;
     this.phone = phone;
-    this.notes = notes;
+    this._notes = notes;
   }
 
-  /** find all customers. */
+  /* Get _notes */
+  get notes() {
+    return this._notes;
+  }
 
-  static async all() {
+  /* Set _notes. If text is falsey, set to empty string. */
+  set notes(text) {
+    if (!text) {
+      this._notes = '';
+    } else {
+      this._notes = text;
+    }
+  }
+
+  /* Get customer's full name */
+  get fullName() {
+    return `${this.firstName} ${this.lastName}`;
+  }
+
+  /* get full name */
+
+  /** find all customers. if searchTerm passed, filter by searchTerm. */
+
+  static async all(searchTerm) {
+    const query = searchTerm || ' ';
+    const [firstName, lastName] = query.split(' ');
     const results = await db.query(
       `SELECT id,
               first_name AS "firstName",
@@ -26,7 +49,9 @@ class Customer {
               phone,
               notes
            FROM customers
-           ORDER BY last_name, first_name`,
+           WHERE first_name ILIKE $1 AND last_name ILIKE $2
+           ORDER BY last_name, first_name;`,
+           [`%${firstName}%`, `%${lastName}%`],
     );
     return results.rows.map(c => new Customer(c));
   }
@@ -105,12 +130,6 @@ class Customer {
       ],
       );
     }
-  }
-
-  /** Returns firstName and lastName joined by a space */
-
-  fullName() {
-    return `${this.firstName} ${this.lastName}`;
   }
 
   /** Gets top ten customers by number of reservations */

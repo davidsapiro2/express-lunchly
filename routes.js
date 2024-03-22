@@ -1,7 +1,5 @@
 "use strict";
-//TODO: separate templates
 //TODO: search for parital first name full last
-//TODO: reservation validation
 
 /** Routes for Lunchly */
 
@@ -24,7 +22,7 @@ router.get("/", async function (req, res, next) {
 
 router.get("/search", async function (req, res, next) {
   const searchQuery = req.query.search;
-  const customers = await Customer.getFiltered(searchQuery);
+  const customers = await Customer.all(searchQuery);
   return res.render("customer_list.jinja", { customers });
 });
 
@@ -52,7 +50,7 @@ router.post("/add/", async function (req, res, next) {
 
 router.get("/top-ten", async function (req, res, next) {
   const customers = await Customer.getTopTen();
-  return res.render('customer_list.jinja', { customers });
+  return res.render('customer_top_ten.jinja', { customers });
 });
 
 /** Show a customer, given their ID. */
@@ -92,9 +90,11 @@ router.post("/:id/edit/", async function (req, res, next) {
 /** Handle adding a new reservation. */
 
 router.post("/:id/add-reservation/", async function (req, res, next) {
-  if (req.body === undefined) {
+  if (req.body === undefined || req.body.startAt === "" ||
+    req.body.numGuests === undefined) {
     throw new BadRequestError();
   }
+
   const customerId = req.params.id;
   const startAt = new Date(req.body.startAt);
   const numGuests = req.body.numGuests;

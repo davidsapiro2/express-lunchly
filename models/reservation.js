@@ -6,6 +6,8 @@ const moment = require("moment");
 
 const db = require("../db");
 
+const { BadRequestError } = require('../expressError');
+
 /** A reservation for a party */
 
 class Reservation {
@@ -14,7 +16,21 @@ class Reservation {
     this.customerId = customerId;
     this.numGuests = numGuests;
     this.startAt = startAt;
-    this.notes = notes;
+    this._notes = notes;
+  }
+
+  /* Get _notes */
+  get notes() {
+    return this._notes;
+  }
+
+  /* Set _notes. If text is falsey, set to empty string. */
+  set notes(text) {
+    if (!text) {
+      this._notes = '';
+    } else {
+      this._notes = text;
+    }
   }
 
   /** formatter for startAt */
@@ -43,6 +59,9 @@ class Reservation {
   /** Save reservation. If doesn't exist, create new reservation. */
 
   async save() {
+    if (Number(this.numGuests) <= 0) {
+      throw new BadRequestError("Number of guests must be greater than 0.");
+    }
     if (this.id === undefined) {
       const result = await db.query(
         `INSERT INTO reservations (customer_id, num_guests, start_at, notes)
