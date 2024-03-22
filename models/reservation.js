@@ -16,7 +16,7 @@ class Reservation {
     this.customerId = customerId;
     this.numGuests = numGuests;
     this.startAt = startAt;
-    this._notes = notes;
+    this.notes = notes;
   }
 
   /* Get _notes */
@@ -32,6 +32,31 @@ class Reservation {
       this._notes = text;
     }
   }
+
+  /** Get _numGuests */
+  get numGuests() {
+    return this._numGuests;
+  }
+
+  /** Set _numGuests. If 0, throws an error */
+  set numGuests(guests) {
+    if (guests < 1) {
+      throw new BadRequestError("Must have at least one guest.");
+    } else {
+      this._numGuests = guests;
+    };
+  }
+
+  /** Get startAt */
+  get startAt() {
+    return this._startAt;
+  }
+
+  /** Set startAt */
+  set startAt(date) {
+    this._startAt = new Date(date);
+  }
+
 
   /** formatter for startAt */
 
@@ -59,9 +84,6 @@ class Reservation {
   /** Save reservation. If doesn't exist, create new reservation. */
 
   async save() {
-    if (Number(this.numGuests) <= 0) {
-      throw new BadRequestError("Number of guests must be greater than 0.");
-    }
     if (this.id === undefined) {
       const result = await db.query(
         `INSERT INTO reservations (customer_id, num_guests, start_at, notes)

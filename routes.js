@@ -11,6 +11,18 @@ const Reservation = require("./models/reservation");
 
 const router = new express.Router();
 
+/** Validates body */
+
+function validateBody (req, res, next) {
+  if (req.body === undefined
+    || !req.body.first_name
+    || !req.body.last_name
+    || !req.body.phone) {
+    throw new BadRequestError();
+  }
+  return next();
+};
+
 /** Homepage: show list of customers. */
 
 router.get("/", async function (req, res, next) {
@@ -35,10 +47,7 @@ router.get("/add/", async function (req, res, next) {
 
 /** Handle adding a new customer. */
 
-router.post("/add/", async function (req, res, next) {
-  if (req.body === undefined) {
-    throw new BadRequestError();
-  }
+router.post("/add/", validateBody, async function (req, res, next) {
   const { firstName, lastName, phone, notes } = req.body;
   const customer = new Customer({ firstName, lastName, phone, notes });
   await customer.save();
@@ -73,10 +82,7 @@ router.get("/:id/edit/", async function (req, res, next) {
 
 /** Handle editing a customer. */
 
-router.post("/:id/edit/", async function (req, res, next) {
-  if (req.body === undefined) {
-    throw new BadRequestError();
-  }
+router.post("/:id/edit/", validateBody, async function (req, res, next) {
   const customer = await Customer.get(req.params.id);
   customer.firstName = req.body.firstName;
   customer.lastName = req.body.lastName;
