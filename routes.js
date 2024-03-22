@@ -17,6 +17,15 @@ router.get("/", async function (req, res, next) {
   return res.render("customer_list.jinja", { customers });
 });
 
+/** Search: show list of customers filtered by query. */
+
+router.get("/search", async function (req, res, next) {
+  const searchQuery = req.query.search;
+  const customers = await Customer.getFiltered(searchQuery);
+  return res.render("customer_list.jinja", { customers });
+});
+
+
 /** Form to add a new customer. */
 
 router.get("/add/", async function (req, res, next) {
